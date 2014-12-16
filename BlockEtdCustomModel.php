@@ -133,7 +133,11 @@ class BlockEtdCustomModel extends ObjectModel {
         $cache->delete("blocketdcustom_*");
 
         // On vide le cache smarty.
-        Tools::clearSmartyCache();
+		if (is_callable(array('Tools', 'clearSmartyCache'))) {
+			Tools::clearSmartyCache();
+		} else {
+			Tools::clearCache();
+		}
 
     }
 
