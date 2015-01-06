@@ -2,7 +2,7 @@
 /**
  * @package     blocketdcustom
  *
- * @version     0.0.1
+ * @version     1.0
  * @copyright   Copyright (C) 2014 Jean-Baptiste Alleaume. Tous droits réservés.
  * @license     http://alleau.me/LICENSE
  * @author      Jean-Baptiste Alleaume http://alleau.me
@@ -15,6 +15,9 @@ include_once(dirname(__FILE__) . '/BlockEtdCustomModel.php');
 
 class BlockEtdCustom extends Module {
 
+	private $_html;
+	private $_display;
+
 	/**
 	 * Hooks disponibles dans Prestashop.
 	 * @var array
@@ -25,13 +28,16 @@ class BlockEtdCustom extends Module {
 
 		$this->name = 'blocketdcustom';
 		$this->tab = 'front_office_features';
-		$this->version = '0.0.1';
+		$this->version = '1.0';
 		$this->author = 'ETD Solutions';
 
+		$this->bootstrap = true;
 		parent::__construct();
 
 		$this->displayName = $this->l('ETD Custom Content');
 		$this->description = $this->l('Add custom block on multiple hooks.');
+		$this->secure_key = Tools::encrypt($this->name);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
 		// On détecte les hooks disponibles.
 		$this->populateHooks();
@@ -61,7 +67,8 @@ class BlockEtdCustom extends Module {
 
 		return
 			parent::install() &&
-			$this->installDB();
+			$this->installDB() &&
+			$this->_clearCache('blocketdcustom.tpl');
 
 	}
 
@@ -101,22 +108,12 @@ class BlockEtdCustom extends Module {
 
 		switch ($this->_display) {
 			case 'add':
-				$this->toolbar_btn['save'] = array(
-					'id' => 'saveCustom',
-					'href' => '#',
-					'desc' => $this->l('Save')
-				);
 				$this->toolbar_btn['cancel'] = array(
 					'href' => $back,
 					'desc' => $this->l('Cancel')
 				);
 				break;
 			case 'edit':
-				$this->toolbar_btn['save'] = array(
-					'id' => 'saveCustom',
-					'href' => '#',
-					'desc' => $this->l('Save')
-				);
 				$this->toolbar_btn['cancel'] = array(
 					'href' => $back,
 					'desc' => $this->l('Cancel')
@@ -125,11 +122,12 @@ class BlockEtdCustom extends Module {
 			case 'index':
 				$this->toolbar_btn['new'] = array(
 					'href' => $current_index.'&amp;configure='.$this->name.'&amp;token='.$token.'&amp;addCustom',
-					'desc' => $this->l('Add new')
+					'desc' => $this->l('Add new'),
 				);
                 $this->toolbar_btn['refresh-cache'] = array(
                     'href' => $current_index.'&amp;configure='.$this->name.'&amp;token='.$token.'&amp;clearCache',
-                    'desc' => $this->l('Clear cache')
+                    'desc' => $this->l('Clear cache'),
+					'class' => 'icon-refresh'
                 );
 				break;
 			default:
@@ -144,22 +142,31 @@ class BlockEtdCustom extends Module {
 		$this->context->controller->addJqueryPlugin('tablednd');
 		$this->context->controller->addJS(_PS_JS_DIR_.'admin-dnd.js');
 
-		$this->_display = 'index';
+		$current_index = AdminController::$currentIndex;
+		$token = Tools::getAdminTokenLite('AdminModules');
 
-		$customs = BlockEtdCustomModel::getCustoms();
+		$this->_display = 'index';
 
 		$this->fields_form[0]['form'] = array(
 			'legend' => array(
 				'title' => $this->l('Custom blocks'),
-				'image' => _PS_ADMIN_IMG_.'information.png'
+				'icon' => 'icon-list-alt'
 			),
 			'input' => array(
 				array(
 					'type' => 'customs',
 					'label' => $this->l('Custom blocks:'),
-					'name' => 'customs[]',
-					'values' => $customs,
+					'name' => 'customs',
+					'values' => BlockEtdCustomModel::getCustoms(),
 					'desc' => $this->l(''),
+				)
+			),
+			'buttons' => array(
+				'newCustom' => array(
+					'title' => $this->l('Add new'),
+					'href' => $current_index.'&amp;configure='.$this->name.'&amp;token='.$token.'&amp;addCustom',
+					'class' => 'pull-right',
+					'icon' => 'process-icon-new'
 				)
 			)
 		);
@@ -177,13 +184,14 @@ class BlockEtdCustom extends Module {
 
 	protected function displayAddForm() {
 
+		$this->_display = 'add';
+		$custom = null;
+
 		if (Tools::isSubmit('editCustom') && Tools::getValue('id_custom')) {
 			$this->_display = 'edit';
 			$id_custom = (int)Tools::getValue('id_custom');
 			$custom = BlockEtdCustomModel::getCustom($id_custom);
 		}
-		else
-			$this->_display = 'add';
 
 		// On récupère les controllers sur lesquels faire les exceptions.
 		$controllers = Dispatcher::getControllers(_PS_FRONT_CONTROLLER_DIR_);
@@ -192,13 +200,9 @@ class BlockEtdCustom extends Module {
 		$this->fields_form[0]['form'] = array(
 			'legend' => array(
 				'title' => $this->l('Details'),
-				'image' => _PS_ADMIN_IMG_.'information.png'
+				'icon' => isset($custom) ? 'icon-edit' : 'icon-plus-square'
 			),
 			'input' => array(
-				array(
-					'type' => 'hidden',
-					'name' => 'submitCustom'
-				),
 				array(
 					'type' => 'hidden',
 					'name' => 'id_custom'
@@ -240,47 +244,45 @@ class BlockEtdCustom extends Module {
 					'lang' => true,
 					'desc' => $this->l(''),
 					//'autoload_rte' => true,
-					'rows' => 5,
+					'rows' => 10,
 					'cols' => 40,
 					'required' => true
 				),
 				array(
-					'type' => 'radio',
+					'type' => 'switch',
 					'label' => $this->l('Published:'),
 					'name' => 'published',
 					'desc' => $this->l(''),
 					'is_bool' => true,
-					'class' => 't',
 					'values' => array(
 						array(
 							'id' => 'published_on',
 							'value' => 1,
-							'label' => 'Yes'
+							'label' => $this->l('Yes')
 						),
 						array(
 							'id' => 'published_off',
 							'value' => 0,
-							'label' => 'No'
+							'label' => $this->l('No')
 						)
 					)
 				),
 				array(
-					'type' => 'radio',
+					'type' => 'switch',
 					'label' => $this->l('Show title:'),
 					'name' => 'showtitle',
 					'desc' => $this->l(''),
 					'is_bool' => true,
-					'class' => 't',
 					'values' => array(
 						array(
 							'id' => 'showtitle_on',
 							'value' => 1,
-							'label' => 'Yes'
+							'label' => $this->l('Yes')
 						),
 						array(
 							'id' => 'showtitle_off',
 							'value' => 0,
-							'label' => 'No'
+							'label' => $this->l('No')
 						)
 					)
 				),
@@ -324,19 +326,27 @@ class BlockEtdCustom extends Module {
 					'controllers' => $controllers,
 					'desc' => $this->l('')
 				)
+			),
+			'submit' => array(
+				'name' => 'submitCustom',
+				'title' => $this->l('Save'),
 			)
 		);
 
 		$this->context->controller->getLanguages();
 
+		$this->fields_value['old_hook'] = '';
 		$this->fields_value['id_custom'] = 0;
 
 		if (Tools::getValue('hook'))
 			$this->fields_value['hook'] = Tools::getValue('hook');
+
 		else if (isset($custom))
 			$this->fields_value['hook'] = $custom['hook'];
 		else
 			$this->fields_value['hook'] = '';
+
+		$this->fields_value['hook_custom'] = $this->fields_value['hook'];
 
 		if (Tools::getValue('etdhook'))
 			$this->fields_value['etdhook'] = Tools::getValue('etdhook');
@@ -445,6 +455,10 @@ class BlockEtdCustom extends Module {
 				$this->_errors[] = $this->l('Please choose a valid hook.');
 			}
 
+			if (Tools::getValue('hook') == "custom" && !Tools::getValue('hook_custom')) {
+				$this->_errors[] = $this->l('Please choose a valid hook.');
+			}
+
 			$languages = LanguageCore::getLanguages(true);
 			foreach ($languages as $language) {
 
@@ -501,6 +515,10 @@ class BlockEtdCustom extends Module {
 			$custom['etdhook'] = Tools::getValue('etdhook', '');
 			$custom['css'] = Tools::getValue('css', '');
 			$custom['exceptions'] = Tools::getValue('exceptions', '');
+
+			if (Tools::getValue('hook') == "custom") {
+				$custom['hook'] = Tools::getValue('hook_custom', '');
+			}
 
 			if (Tools::isSubmit('addCustom')) {
 
