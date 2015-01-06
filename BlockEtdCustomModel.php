@@ -44,7 +44,6 @@ class BlockEtdCustomModel extends ObjectModel {
 			LEFT JOIN ' . _DB_PREFIX_ . 'etd_custom_lang AS b ON b.id_custom = a.id
 			LEFT JOIN ' . _DB_PREFIX_ . 'etd_custom_shop AS c ON c.id_custom = a.id
 			WHERE
-				' . ($published ? 'c.published = 1 AND' : '') . '
 				a.id = ' . (int) $id_custom . '
 				AND c.id_shop IN('.($id_shop ? (int)$id_shop : implode(', ', Shop::getContextListShopID())).')
 		';

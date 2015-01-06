@@ -84,42 +84,21 @@
 						<table class="table">
 							<thead>
 							<tr>
-								<th>
-									<input type="checkbox" name="checkme" id="checkme" class="noborder" onclick="checkDelBoxes(this.form, '{$input.name}', this.checked)" />
-								</th>
 								<th>{l s='Name' mod='blocketdcustom'}</th>
 								<th>{l s='Status' mod='blocketdcustom'}</th>
-								<th>{l s='Ordering' mod='blocketdcustom'}</th>
 								<th>{l s='Access' mod='blocketdcustom'}</th>
 								<th>{l s='Hook' mod='blocketdcustom'}</th>
-								<th>{l s='ID' mod='blocketdcustom'}</th>
-								<th>{l s='Actions' mod='blocketdcustom'}</th>
+								<th>&nbsp;</th>
 							</tr>
 							</thead>
 							<tbody>
 							{foreach $customs as $key => $custom}
 								<tr {if $key%2}class="alt_row"{/if}>
 									<td>
-										{assign var=id_checkbox value=$custom.id}
-										<input type="checkbox" class="cmsBox" name="{$input.name}" id="{$id_checkbox}" value="{$id_checkbox}" {if isset($fields_value[$id_checkbox])}checked="checked"{/if} />
-									</td>
-									<td>
-										<label class="control-label" for="{$id_checkbox}">{$custom.title|escape}</label>
+										{$custom.title|escape}
 									</td>
 									<td>
 										<img src="{$smarty.const._PS_ADMIN_IMG_}{if $custom.published}enabled.gif{else}disabled.gif{/if}" alt="{if $custom.published}{l s='Enabled'}{else}{l s='Disabled'}{/if}" title="{if $custom.published}{l s='Enabled'}{else}{l s='Disabled'}{/if}" />
-									</td>
-									<td>
-										{if isset($custom.parent_id) && isset($input.ordering[$custom.parent_id][$orderkey - 1])}
-											<a href="{$current}&token={$token}&orderUp&id_custom={(int)$custom.id}">
-												<img src="{$smarty.const._PS_ADMIN_IMG_}{if $order_way == 'ASC'}down{else}up{/if}.gif" alt="{l s='Down'}" title="{l s='Down'}" />
-											</a>
-										{/if}
-										{if isset($custom.parent_id) && isset($input.ordering[$custom.parent_id][$orderkey + 1])}
-											<a href="{$current}&token={$token}&orderDown&id_custom={(int)$custom.id}">
-												<img src="{$smarty.const._PS_ADMIN_IMG_}{if $order_way == 'ASC'}up{else}down{/if}.gif" alt="{l s='Up'}" title="{l s='Up'}" />
-											</a>
-										{/if}
 									</td>
 									<td>
 										{if $custom.access == 0}
@@ -134,7 +113,23 @@
 										{$custom.hook}
 									</td>
 									<td>
-										{$custom.id}
+										<div class="btn-group-action">
+											<div class="btn-group pull-right">
+												<a class="btn btn-default" href="{$current}&token={$token}&editCustom&id_custom={(int)$custom.id}" title="{l s='Edit' mod='blocketdcustom'}">
+													<i class="icon-edit"></i> {l s='Edit' mod='blocketdcustom'}
+												</a>
+												<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+													<i class="icon-caret-down"></i>&nbsp;
+												</button>
+												<ul class="dropdown-menu">
+													<li>
+														<a href="{$current}&token={$token}&deleteCustom&id_custom={(int)$custom.id}" title="{l s='Delete' mod='blocketdcustom'}">
+															<i class="icon-trash"></i> {l s='Delete' mod='blocketdcustom'}
+														</a>
+													</li>
+												</ul>
+											</div>
+										</div>
 									</td>
 								</tr>
 							{/foreach}
