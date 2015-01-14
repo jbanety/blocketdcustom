@@ -76,7 +76,7 @@
 		{assign var=customs value=$input.values}
 		{if isset($customs) && count($customs) > 0}
 			<div class="row">
-				<div class="col-lg-9 col-lg-offset-3">
+				<div class="col-lg-12">
 					<div class="panel">
 						<div class="panel-heading">
 							{$input.label}
