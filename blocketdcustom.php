@@ -552,27 +552,39 @@ class BlockEtdCustom extends Module {
 
 				Tools::redirectAdmin(AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules').'&deleteCustomConfirmation');
 			} else
-				$this->_html .= $this->displayError($this->l('You are trying to delete a non-existing link. '));
+				$this->_html .= $this->displayError($this->l('You are trying to duplicate a non-existing block. '));
+
+		} elseif (Tools::isSubmit('duplicateCustom') && Tools::getValue('id_custom')) {
+			$id_custom = (int) Tools::getvalue('id_custom');
+
+			if ($id_custom) {
+
+				if (!BlockEtdCustomModel::duplicateCustom($id_custom))
+					return false;
+
+				Tools::redirectAdmin(AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules').'&duplicateCustomConfirmation');
+			} else
+				$this->_html .= $this->displayError($this->l('You are trying to delete a non-existing block. '));
 
 		} elseif (Tools::isSubmit('orderUp') && Tools::getValue('id_custom')) {
 			$id_custom = (int) Tools::getvalue('id_custom');
 
 			if ($id_custom) {
 				if (!BlockEtdCustomModel::orderUp($id_custom)) {
-					$this->_html .= $this->displayError($this->l('An error occured when trying order a link. '));
+					$this->_html .= $this->displayError($this->l('An error occured when trying order a block. '));
 				}
 			} else
-				$this->_html .= $this->displayError($this->l('You are trying to order a non-existing link. '));
+				$this->_html .= $this->displayError($this->l('You are trying to order a non-existing block. '));
 
 		} elseif (Tools::isSubmit('orderDown') && Tools::getValue('id_custom')) {
 			$id_custom = (int) Tools::getvalue('id_custom');
 
 			if ($id_custom) {
 				if (!BlockEtdCustomModel::orderDown($id_custom)) {
-					$this->_html .= $this->displayError($this->l('An error occured when trying order a link. '));
+					$this->_html .= $this->displayError($this->l('An error occured when trying order a block. '));
 				}
 			} else
-				$this->_html .= $this->displayError($this->l('You are trying to order a non-existing link. '));
+				$this->_html .= $this->displayError($this->l('You are trying to order a non-existing block. '));
 
         } elseif (Tools::isSubmit('clearCache')) {
 
@@ -583,6 +595,8 @@ class BlockEtdCustom extends Module {
 			$this->_html .= $this->displayConfirmation($this->l('Custom block added.'));
 		elseif (Tools::isSubmit('editCustomConfirmation'))
 			$this->_html .= $this->displayConfirmation($this->l('Custom block edited.'));
+		elseif (Tools::isSubmit('duplicateCustomConfirmation'))
+			$this->_html .= $this->displayConfirmation($this->l('Custom block duplicated.'));
         elseif (Tools::isSubmit('clearCacheConfirmation'))
             $this->_html .= $this->displayConfirmation($this->l('Cache cleared.'));
 

@@ -125,6 +125,21 @@ class BlockEtdCustomModel extends ObjectModel {
 
 	}
 
+	public static function duplicateCustom($id_custom) {
+
+		$custom              = self::getCustom($id_custom);
+		$custom['id']        = '0';
+		$custom['published'] = '0';
+        $custom['shops']     = Shop::getContextListShopID();
+
+		foreach ($custom['title'] as &$title) {
+			$title = self::increment($title);
+		}
+
+		return self::storeCustom($custom);
+
+	}
+
     public  static function cleanCache() {
 
         // On vide le cache Prestashop.
@@ -139,5 +154,64 @@ class BlockEtdCustomModel extends ObjectModel {
 		}
 
     }
+
+	/**
+	 * Increments a trailing number in a string.
+	 *
+	 * Used to easily create distinct labels when copying objects. The method has the following styles:
+	 *
+	 * default: "Label" becomes "Label (2)"
+	 * dash:    "Label" becomes "Label-2"
+	 *
+	 * @param   string   $string  The source string.
+	 * @param   integer  $n       If supplied, this number is used for the copy, otherwise it is the 'next' number.
+	 *
+	 * @return  string  The incremented string.
+	 *
+	 * @since   1.0
+	 */
+	protected static function increment($string, $n = 0)
+	{
+		$styleSpec = array(
+			array('#\((\d+)\)$#', '#\(\d+\)$#'),
+			array(' (%d)', '(%d)'),
+		);
+
+		// Regular expression search and replace patterns.
+		if (is_array($styleSpec[0]))
+		{
+			$rxSearch = $styleSpec[0][0];
+			$rxReplace = $styleSpec[0][1];
+		}
+		else
+		{
+			$rxSearch = $rxReplace = $styleSpec[0];
+		}
+
+		// New and old (existing) sprintf formats.
+		if (is_array($styleSpec[1]))
+		{
+			$newFormat = $styleSpec[1][0];
+			$oldFormat = $styleSpec[1][1];
+		}
+		else
+		{
+			$newFormat = $oldFormat = $styleSpec[1];
+		}
+
+		// Check if we are incrementing an existing pattern, or appending a new one.
+		if (preg_match($rxSearch, $string, $matches))
+		{
+			$n = empty($n) ? ($matches[1] + 1) : $n;
+			$string = preg_replace($rxReplace, sprintf($oldFormat, $n), $string);
+		}
+		else
+		{
+			$n = empty($n) ? 2 : $n;
+			$string .= sprintf($newFormat, $n);
+		}
+
+		return $string;
+	}
 
 }

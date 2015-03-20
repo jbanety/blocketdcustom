@@ -123,6 +123,9 @@
 												</button>
 												<ul class="dropdown-menu">
 													<li>
+														<a href="{$current}&token={$token}&duplicateCustom&id_custom={(int)$custom.id}" title="{l s='Duplicate' mod='blocketdcustom'}">
+															<i class="icon-copy"></i> {l s='Duplicate' mod='blocketdcustom'}
+														</a>
 														<a href="{$current}&token={$token}&deleteCustom&id_custom={(int)$custom.id}" title="{l s='Delete' mod='blocketdcustom'}">
 															<i class="icon-trash"></i> {l s='Delete' mod='blocketdcustom'}
 														</a>
