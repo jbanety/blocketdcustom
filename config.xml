@@ -2,7 +2,7 @@
         <module>
             <name>blocketdcustom</name>
             <displayName><![CDATA[ETD Contenu personnalis&eacute;]]></displayName>
-            <version><![CDATA[0.0.1]]></version>
+            <version><![CDATA[1.0]]></version>
             <description><![CDATA[Ajoute des blocs personnalis&eacute;s sur plusieurs hooks.]]></description>
             <author><![CDATA[ETD Solutions]]></author>
             <tab><![CDATA[front_office_features]]></tab>
