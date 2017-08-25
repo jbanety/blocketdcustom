@@ -278,6 +278,54 @@ class BlockEtdCustom extends Module {
 						)
 					)
 				),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Block Tag:'),
+                    'name' => 'block_tag',
+                    'desc' => $this->l('Block custom HTML tag'),
+                    'size' => 3,
+                    'maxlength' => 3
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Title Tag:'),
+                    'name' => 'title_tag',
+                    'desc' => $this->l('Title custom HTML tag'),
+                    'size' => 3,
+                    'maxlength' => 3
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Content Tag:'),
+                    'name' => 'content_tag',
+                    'desc' => $this->l('Content custom HTML tag'),
+                    'size' => 3,
+                    'maxlength' => 3
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Block CSS Class:'),
+                    'name' => 'block_class',
+                    'desc' => $this->l('Block custom CSS Class'),
+                    'size' => 40,
+                    'maxlength' => 50
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Title CSS Class:'),
+                    'name' => 'title_class',
+                    'desc' => $this->l('Title custom CSS Class'),
+                    'size' => 40,
+                    'maxlength' => 50
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Content CSS Class:'),
+                    'name' => 'content_class',
+                    'desc' => $this->l('Content custom CSS Class'),
+                    'size' => 40,
+                    'maxlength' => 50
+                ),
 				array(
 					'type' => 'select',
 					'label' => $this->l('Access:'),
@@ -302,14 +350,6 @@ class BlockEtdCustom extends Module {
 						)
 					),
 					'desc' => $this->l('')
-				),
-				array(
-					'type' => 'text',
-					'label' => $this->l('CSS Class:'),
-					'name' => 'css',
-					'desc' => $this->l('Custom CSS Class'),
-					'size' => 40,
-					'maxlength' => 255,
 				),
 				array(
 					'type' => 'exceptions',
@@ -389,12 +429,47 @@ class BlockEtdCustom extends Module {
 		else
 			$this->fields_value['showtitle'] = 0;
 
-		if (Tools::getValue('css'))
-			$this->fields_value['css'] = Tools::getValue('css');
+		if (Tools::getValue('block_tag'))
+			$this->fields_value['block_tag'] = Tools::getValue('block_tag');
 		else if (isset($custom))
-			$this->fields_value['css'] = $custom['css'];
+			$this->fields_value['block_tag'] = $custom['block_tag'];
 		else
-			$this->fields_value['css'] = '';
+			$this->fields_value['block_tag'] = '';
+
+		if (Tools::getValue('title_tag'))
+			$this->fields_value['title_tag'] = Tools::getValue('title_tag');
+		else if (isset($custom))
+			$this->fields_value['title_tag'] = $custom['title_tag'];
+		else
+			$this->fields_value['title_tag'] = '';
+
+		if (Tools::getValue('content_tag'))
+			$this->fields_value['content_tag'] = Tools::getValue('content_tag');
+		else if (isset($custom))
+			$this->fields_value['content_tag'] = $custom['content_tag'];
+		else
+			$this->fields_value['content_tag'] = '';
+
+		if (Tools::getValue('block_class'))
+			$this->fields_value['block_class'] = Tools::getValue('block_class');
+		else if (isset($custom))
+			$this->fields_value['block_class'] = $custom['block_class'];
+		else
+			$this->fields_value['block_class'] = '';
+
+		if (Tools::getValue('title_class'))
+			$this->fields_value['title_class'] = Tools::getValue('title_class');
+		else if (isset($custom))
+			$this->fields_value['title_class'] = $custom['title_class'];
+		else
+			$this->fields_value['title_class'] = '';
+
+		if (Tools::getValue('content_class'))
+			$this->fields_value['content_class'] = Tools::getValue('content_class');
+		else if (isset($custom))
+			$this->fields_value['content_class'] = $custom['content_class'];
+		else
+			$this->fields_value['content_class'] = '';
 
 		if (Tools::getValue('exceptions'))
 			$this->fields_value['exceptions'] = explode(',',Tools::getValue('exceptions'));
@@ -502,7 +577,12 @@ class BlockEtdCustom extends Module {
 			$custom['access'] = Tools::getValue('access', 0);
 			$custom['hook'] = Tools::getValue('hook', '');
 			$custom['etdhook'] = Tools::getValue('etdhook', '');
-			$custom['css'] = Tools::getValue('css', '');
+			$custom['block_tag'] = Tools::getValue('block_tag', '');
+			$custom['title_tag'] = Tools::getValue('title_tag', '');
+			$custom['content_tag'] = Tools::getValue('content_tag', '');
+			$custom['block_class'] = Tools::getValue('block_class', '');
+			$custom['title_class'] = Tools::getValue('title_class', '');
+			$custom['content_class'] = Tools::getValue('content_class', '');
 			$custom['exceptions'] = Tools::getValue('exceptions', '');
 
 			if (Tools::isSubmit('addCustom')) {
@@ -635,38 +715,10 @@ class BlockEtdCustom extends Module {
 
 		if (count($this->_errors)) {
 			foreach ($this->_errors as $err)
-				$this->_html .= '<div class="alert error">'.$err.'</div>';
+				$this->_html .= '<div class="alert alert-danger">'.$err.'</div>';
 
 			return false;
 		}
-
-		return true;
-
-	}
-
-	protected function unregisterCustomHook($custom) {
-
-		/*if (is_int($custom)) {
-			$custom = BlockEtdCustomModel::getCustom($custom);
-		}
-
-		$id_hook = (int) Hook::getIdByName($custom['hook']);
-		$hook = new Hook($id_hook);
-
-		if (!$id_hook || !Validate::isLoadedObject($hook)) {
-			$this->errors[] = $this->displayError('Hook cannot be loaded.');
-		}
-
-		if (!$this->unregisterHook($hook->name, $custom['shops'])) {
-			$this->errors[] = $this->displayError('An error occurred while deleting the module from its hook.');
-		}
-
-		if (count($this->_errors)) {
-			foreach ($this->_errors as $err)
-				$this->_html .= '<div class="alert error">'.$err.'</div>';
-
-			return false;
-		}*/
 
 		return true;
 
@@ -717,14 +769,7 @@ class BlockEtdCustom extends Module {
 
 		$cacheId = $this->getCacheId($this->name . '|' . $custom['id']);
 		if (!$this->isCached('blocketdcustom.tpl', $cacheId)) {
-			$this->smarty->assign(array(
-				'content' => $custom['content'],
-				'title' => $custom['title'],
-				'showtitle' => $custom['showtitle'],
-				'hook' => $custom['hook'],
-				'etdhook' => $custom['etdhook'],
-			 	'css' => $custom['css']
-  			));
+			$this->smarty->assign($custom);
 		}
 		return $this->display(__FILE__, 'blocketdcustom.tpl', $cacheId);
 

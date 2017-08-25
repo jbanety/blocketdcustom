@@ -1,3 +1,11 @@
+{**
+ * @package     blocketdcustom
+ *
+ * @version     2.0
+ * @copyright   Copyright (C) 2017 ETD Solutions. Tous droits réservés.
+ * @license     https://raw.githubusercontent.com/jbanety/blocketdtopmenu/master/LICENSE
+ * @author      Jean-Baptiste Alleaume http://alleau.me
+ *}
 {extends file="helpers/form/form.tpl"}
 
 {block name="label"}
@@ -66,14 +74,14 @@
 									<i class="icon-caret-square-o-up"></i>
 								</a>
 								{else}
-									<span class="btn btn-link">&nbsp;</span>
+									<span class="btn btn-link">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 								{/if}
 								{if !$custom@last && isset($customs[$key+1]) && $customs[$key+1].hook == $custom.hook}
 								 <a href="{$current}&token={$token}&orderDownCustom&id_custom={(int)$custom.id}" title="{l s='Order Down' mod='blocketdcustom'}" class="btn btn-link">
 									<i class="icon-caret-square-o-down"></i>
 								</a>
 								{else}
-									<span class="btn btn-link">&nbsp;</span>
+									<span class="btn btn-link">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 								{/if}
 							</td>
 							<td class="text-center">

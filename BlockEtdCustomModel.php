@@ -91,7 +91,7 @@ class BlockEtdCustomModel extends ObjectModel {
 
 		if ($update && is_int($custom['id']) && $custom['id'] > 0) {
 
-			$sql = "update " . _DB_PREFIX_ . "etd_custom set hook = '" . $db->escape($custom['hook']) . "', etdhook = '" . $db->escape($custom['etdhook']) . "', css = '" . $db->escape($custom['css']) . "', access = " . (int) $custom['access'] . ", showtitle = " . (int) $custom['showtitle'] . ", params = '" . $db->escape($custom['params']) . "', exceptions = '" . $db->escape($custom['exceptions']) . "', ordering = '" . (int) $custom['ordering'] . "', published = '" . (int) $custom['published'] . "' where id = " . $custom['id'];
+			$sql = "update " . _DB_PREFIX_ . "etd_custom set hook = '" . $db->escape($custom['hook']) . "', etdhook = '" . $db->escape($custom['etdhook']) . "', block_tag = '" . $db->escape($custom['block_tag']) . "', title_tag = '" . $db->escape($custom['title_tag']) . "', content_tag = '" . $db->escape($custom['content_tag']) . "', block_class = '" . $db->escape($custom['block_class']) . "', title_class = '" . $db->escape($custom['title_class']) . "', content_class = '" . $db->escape($custom['content_class']) . "', access = " . (int) $custom['access'] . ", showtitle = " . (int) $custom['showtitle'] . ", params = '" . $db->escape($custom['params']) . "', exceptions = '" . $db->escape($custom['exceptions']) . "', ordering = '" . (int) $custom['ordering'] . "', published = '" . (int) $custom['published'] . "' where id = " . $custom['id'];
 			$db->execute($sql);
 			$sql = "delete from " . _DB_PREFIX_ . "etd_custom_lang where id_custom = " . $custom['id'];
 			$db->execute($sql);
@@ -110,7 +110,7 @@ class BlockEtdCustomModel extends ObjectModel {
                 $custom['ordering'] = 1;
             }
 
-			$sql = "insert into " . _DB_PREFIX_ . "etd_custom (hook, etdhook, access, showtitle, params, css, ordering, published, exceptions) VALUES ('" . $db->escape($custom['hook']) . "', '" . $db->escape($custom['etdhook']) . "', " . (int) $custom['access'] . ", " . (int) $custom['showtitle'] . ", '" . $db->escape($custom['params']) . "', '" . $db->escape($custom['css']) . "', '" . (int) $custom['ordering'] . "', '" . (int) $custom['published'] . "', '" . $db->escape($custom['exceptions']) . "')";
+			$sql = "insert into " . _DB_PREFIX_ . "etd_custom (hook, etdhook, access, showtitle, params, block_tag, title_tag, content_tag, block_class, title_class, content_class, ordering, published, exceptions) VALUES ('" . $db->escape($custom['hook']) . "', '" . $db->escape($custom['etdhook']) . "', " . (int) $custom['access'] . ", " . (int) $custom['showtitle'] . ", '" . $db->escape($custom['params']) . "', '" . $db->escape($custom['block_tag']) . "', '" . $db->escape($custom['title_tag']) . "', '" . $db->escape($custom['content_tag']) . "', '" . $db->escape($custom['block_class']) . "', '" . $db->escape($custom['title_class']) . "', '" . $db->escape($custom['content_class']) . "', '" . (int) $custom['ordering'] . "', '" . (int) $custom['published'] . "', '" . $db->escape($custom['exceptions']) . "')";
 			$db->execute($sql);
 
 			$custom['id'] = $db->Insert_ID();
